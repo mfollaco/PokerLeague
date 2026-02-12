@@ -7,33 +7,34 @@ OUT_DIR = Path("output")
 TABLES_DIR = OUT_DIR / "tables"
 
 def format_int_cols_for_html(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
-    df = df.copy()
+    """
+    For HTML rendering only: format specified columns as whole numbers with thousands separators.
+    Leaves the original df untouched (returns a copy).
+    - Accepts numeric or string inputs (e.g., '3,450')
+    - Non-parsable values become blank in HTML (""), but you can change that behavior if desired.
+    """
+    if df is None or df.empty:
+        return df
 
-    for col in cols:
-        if col not in df.columns:
-            df[col] = (
-                pd.to_numeric(df[col], errors="coerce")
-                .fillna(0)
-                .round(0)
-                .astype(int)
-                .map(lambda x: f"{x:,}")
-            )
+    out = df.copy()
 
-    return df
+    for c in cols:
+        if c not in out.columns:
+            continue
 
-        # Convert safely to numeric even if it's already formatted like "3,450"
-    s = (
-            df[col]
-            .astype(str)
+        # Convert to numeric safely even if the column already contains commas/strings
+        s = (
+            out[c]
+            .astype("string")
             .str.replace(",", "", regex=False)
+            .str.strip()
         )
+        s_num = pd.to_numeric(s, errors="coerce")
 
-    nums = pd.to_numeric(s, errors="coerce")
+        # Whole numbers with commas; blanks for NaN
+        out[c] = s_num.map(lambda x: "" if pd.isna(x) else f"{int(round(x)):,}")
 
-        # Keep blanks if missing, otherwise format as whole number with commas
-    df[col] = nums.map(lambda x: "" if pd.isna(x) else f"{int(round(x)):,}")
-
-    return df
+    return out
 
 def load_raw_events(data_dir: Path) -> pd.DataFrame:
     files = sorted(data_dir.glob("*.csv"))
