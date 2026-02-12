@@ -9,21 +9,29 @@ TABLES_DIR = OUT_DIR / "tables"
 def format_int_cols_for_html(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     df = df.copy()
 
-    for c in cols:
-        if c not in df.columns:
-            continue
+    for col in cols:
+        if col not in df.columns:
+            df[col] = (
+                pd.to_numeric(df[col], errors="coerce")
+                .fillna(0)
+                .round(0)
+                .astype(int)
+                .map(lambda x: f"{x:,}")
+            )
+
+    return df
 
         # Convert safely to numeric even if it's already formatted like "3,450"
-        s = (
-            df[c]
+    s = (
+            df[col]
             .astype(str)
             .str.replace(",", "", regex=False)
         )
 
-        nums = pd.to_numeric(s, errors="coerce")
+    nums = pd.to_numeric(s, errors="coerce")
 
         # Keep blanks if missing, otherwise format as whole number with commas
-        df[c] = nums.map(lambda x: "" if pd.isna(x) else f"{int(round(x)):,}")
+    df[col] = nums.map(lambda x: "" if pd.isna(x) else f"{int(round(x)):,}")
 
     return df
 
@@ -692,6 +700,7 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
                 "Season Points Chips",
                 "Total Eliminations",
                 "Chips From Total Elims",
+                "Repeat Elim Count",
                 "Repeat Elim Chips",
                 "High Value Elim Count",
                 "Chips From HV Elims",
@@ -707,6 +716,7 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
             "Season Points Chips",
             "Total Eliminations",
             "Chips From Total Elims",
+            "Repeat Elim Count",
             "Repeat Elim Chips",
             "High Value Elim Count",
             "Chips From HV Elims",
