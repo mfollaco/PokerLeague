@@ -694,9 +694,7 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
     chip_and_chair = tables.get("ChipAndChair")
 
     if chip_and_chair is not None:
-        chip_and_chair = format_int_cols_for_html(
-            chip_and_chair.copy(),
-            [
+            cols_to_format = [
                 "Season Points Chips",
                 "Total Eliminations",
                 "Chips From Total Elims",
@@ -706,36 +704,10 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
                 "Chips From HV Elims",
                 "Base Stack",
                 "Total Stack",
-            ],
-        )
+            ]
 
-    if chip_and_chair is not None:
-        chip_and_chair = chip_and_chair.copy()
-
-        cols_to_format = [
-            "Season Points Chips",
-            "Total Eliminations",
-            "Chips From Total Elims",
-            "Repeat Elim Count",
-            "Repeat Elim Chips",
-            "High Value Elim Count",
-            "Chips From HV Elims",
-            "Base Stack",
-            "Total Stack",
-        ]
-
-        for col in cols_to_format:
-            if col in chip_and_chair.columns:
-                chip_and_chair[col] = (
-                    pd.to_numeric(
-                        chip_and_chair[col].astype(str).str.replace(",", "", regex=False),
-                        errors="coerce",
-                    )
-                    .fillna(0)
-                    .round(0)
-                    .astype(int)
-                    .map("{:,}".format)
-                )
+    chip_and_chair = format_int_cols_for_html(chip_and_chair.copy(), cols_to_format)
+    chip_and_chair = chip_and_chair.rename(columns={"SeasonRank": "Season Rank"})
 
     if season is None:
         raise SystemExit("SeasonTotals missing from tables. Fix build_tables() return dict.")
