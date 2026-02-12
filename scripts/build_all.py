@@ -10,8 +10,7 @@ def format_int_cols_for_html(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """
     For HTML rendering only: format specified columns as whole numbers with thousands separators.
     Leaves the original df untouched (returns a copy).
-    - Accepts numeric or string inputs (e.g., '3,450')
-    - Non-parsable values become blank in HTML (""), but you can change that behavior if desired.
+    Accepts numeric or string inputs (e.g., "3,450"). Non-parsable values become blank in HTML ("").
     """
     if df is None or df.empty:
         return df
