@@ -6,6 +6,27 @@ DATA_DIR = Path("data")
 OUT_DIR = Path("output")
 TABLES_DIR = OUT_DIR / "tables"
 
+def format_int_cols_for_html(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    df = df.copy()
+
+    for c in cols:
+        if c not in df.columns:
+            continue
+
+        # Convert safely to numeric even if it's already formatted like "3,450"
+        s = (
+            df[c]
+            .astype(str)
+            .str.replace(",", "", regex=False)
+        )
+
+        nums = pd.to_numeric(s, errors="coerce")
+
+        # Keep blanks if missing, otherwise format as whole number with commas
+        df[c] = nums.map(lambda x: "" if pd.isna(x) else f"{int(round(x)):,}")
+
+    return df
+
 def load_raw_events(data_dir: Path) -> pd.DataFrame:
     files = sorted(data_dir.glob("*.csv"))
     if not files:
@@ -665,6 +686,21 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
     chip_and_chair = tables.get("ChipAndChair")
 
     if chip_and_chair is not None:
+        chip_and_chair = format_int_cols_for_html(
+            chip_and_chair.copy(),
+            [
+                "Season Points Chips",
+                "Total Eliminations",
+                "Chips From Total Elims",
+                "Repeat Elim Chips",
+                "High Value Elim Count",
+                "Chips From HV Elims",
+                "Base Stack",
+                "Total Stack",
+            ],
+        )
+
+    if chip_and_chair is not None:
         chip_and_chair = chip_and_chair.copy()
 
         cols_to_format = [
@@ -681,8 +717,12 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
         for col in cols_to_format:
             if col in chip_and_chair.columns:
                 chip_and_chair[col] = (
-                    chip_and_chair[col]
+                    pd.to_numeric(
+                        chip_and_chair[col].astype(str).str.replace(",", "", regex=False),
+                        errors="coerce",
+                    )
                     .fillna(0)
+                    .round(0)
                     .astype(int)
                     .map("{:,}".format)
                 )
