@@ -1,0 +1,59 @@
+SourceFile,TournamentDate,EliminationTime,EliminatedPlayer,EliminatorPlayer
+01.13.26 log.csv,2026-01-13,19:38:00,Russ T,Josh T
+01.13.26 log.csv,2026-01-13,19:47:00,Greg,Dan T
+01.13.26 log.csv,2026-01-13,20:22:00,Josh H,Steve C
+01.13.26 log.csv,2026-01-13,20:37:00,Dan P,Phil Z
+01.13.26 log.csv,2026-01-13,20:38:00,Dave B,Mike F
+01.13.26 log.csv,2026-01-13,20:58:00,Chris,Todd L
+01.13.26 log.csv,2026-01-13,21:52:00,Josh T,Dan T
+01.13.26 log.csv,2026-01-13,21:53:00,Joe Fitz,Steve C
+01.13.26 log.csv,2026-01-13,21:53:00,Gerry I,Steve C
+01.13.26 log.csv,2026-01-13,21:53:00,Joe Ferrigno,Dan T
+01.13.26 log.csv,2026-01-13,21:53:00,Phil Z,Steve C
+01.13.26 log.csv,2026-01-13,21:53:00,Todd L,Steve C
+01.13.26 log.csv,2026-01-13,21:54:00,Dan T,Steve C
+01.13.26 log.csv,2026-01-13,21:58:00,Mike F,Bill B
+01.13.26 log.csv,2026-01-13,22:26:00,Steve C,Bill B
+01.20.26 log.csv,2026-01-20,19:43:00,Chris,Josh T
+01.20.26 log.csv,2026-01-20,19:50:00,Greg,Josh H
+01.20.26 log.csv,2026-01-20,20:09:00,Todd L,Dan P
+01.20.26 log.csv,2026-01-20,20:12:00,Phil Z,Dan P
+01.20.26 log.csv,2026-01-20,20:18:00,Joe Fitz,Josh H
+01.20.26 log.csv,2026-01-20,20:38:00,Dan T,Bill B
+01.20.26 log.csv,2026-01-20,20:48:00,Gerry I,Mike F
+01.20.26 log.csv,2026-01-20,21:15:00,Josh T,Mike F
+01.20.26 log.csv,2026-01-20,21:15:00,Russ T,Mike F
+01.20.26 log.csv,2026-01-20,21:21:00,Dave B,Mike F
+01.20.26 log.csv,2026-01-20,21:25:00,Dan P,Mike F
+01.20.26 log.csv,2026-01-20,21:32:00,Joe Ferrigno,Josh H
+01.20.26 log.csv,2026-01-20,21:48:00,Mike F,Bill B
+01.20.26 log.csv,2026-01-20,22:01:00,Steve C,Josh H
+01.20.26 log.csv,2026-01-20,22:01:00,Bill B,Josh H
+01.27.26 log.csv,2026-01-27,19:40:00,Dan T,Dave B
+01.27.26 log.csv,2026-01-27,19:56:00,Chris,Greg
+01.27.26 log.csv,2026-01-27,20:21:00,Joe Ferrigno,Greg
+01.27.26 log.csv,2026-01-27,20:28:00,Phil Z,Josh T
+01.27.26 log.csv,2026-01-27,20:36:00,Russ T,Dan P
+01.27.26 log.csv,2026-01-27,20:45:00,Josh H,Bill B
+01.27.26 log.csv,2026-01-27,20:45:00,Joe Fitz,Bill B
+01.27.26 log.csv,2026-01-27,20:53:00,Dave B,Greg
+01.27.26 log.csv,2026-01-27,20:53:00,Gerry I,Greg
+01.27.26 log.csv,2026-01-27,21:02:00,Dan P,Josh T
+01.27.26 log.csv,2026-01-27,21:07:00,Josh T,Steve C
+01.27.26 log.csv,2026-01-27,21:18:00,Bill B,Greg
+01.27.26 log.csv,2026-01-27,21:41:00,Todd L,Steve C
+01.27.26 log.csv,2026-01-27,21:47:00,Greg,Steve C
+02.03.26 log.csv,2026-02-03,19:33:00,Josh H,Mike F
+02.03.26 log.csv,2026-02-03,20:00:00,Dave B,Phil Z
+02.03.26 log.csv,2026-02-03,20:17:00,Dan P,Greg
+02.03.26 log.csv,2026-02-03,20:17:00,Dan T,Gerry I
+02.03.26 log.csv,2026-02-03,20:19:00,Bill B,Phil Z
+02.03.26 log.csv,2026-02-03,20:43:00,Josh T,Greg
+02.03.26 log.csv,2026-02-03,21:01:00,Todd L,Phil Z
+02.03.26 log.csv,2026-02-03,21:01:00,Greg,Phil Z
+02.03.26 log.csv,2026-02-03,21:07:00,Steve C,Phil Z
+02.03.26 log.csv,2026-02-03,21:21:00,Chris,Russ T
+02.03.26 log.csv,2026-02-03,21:29:00,Joe Fitz,Phil Z
+02.03.26 log.csv,2026-02-03,21:48:00,Russ T,Mike F
+02.03.26 log.csv,2026-02-03,21:50:00,Gerry I,Phil Z
+02.03.26 log.csv,2026-02-03,22:07:00,Mike F,Phil Z
