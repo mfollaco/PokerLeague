@@ -1,15 +1,17 @@
 from curses import raw
 from pathlib import Path
 import pandas as pd
-from datetime import datetime, timezone
+from datetime import datetime
 
 DATA_DIR = Path("data")
 OUT_DIR = Path("output")
 TABLES_DIR = OUT_DIR / "tables"
 
-from datetime import datetime, timezone
+from datetime import datetime
 
-BUILD_TS_UTC = datetime.now(timezone.utc).strftime("%b %d, %Y %I:%M %p UTC")
+from zoneinfo import ZoneInfo
+
+BUILD_TS_EST = datetime.now(ZoneInfo("America/New_York")).strftime("%b %d, %Y %I:%M %p %Z")
 
 def format_int_cols_for_html(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """
@@ -767,7 +769,7 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
 <body>
   <h1>PokerLeague Stats</h1>
   <p style="margin: 6px 0 14px; color: #666; font-size: 13px;">
-  Updated: <strong>{BUILD_TS_UTC}</strong>
+  UUpdated: <strong>{BUILD_TS_EST}</strong>
 </p>
 
 {_nav()}
