@@ -664,6 +664,29 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
     winners = tables.get("Winners")
     chip_and_chair = tables.get("ChipAndChair")
 
+    if chip_and_chair is not None:
+    chip_and_chair = chip_and_chair.copy()
+
+    cols_to_format = [
+        "Season Points Chips",
+        "Total Eliminations",
+        "Chips From Total Elims",
+        "Repeat Elim Chips",
+        "High Value Elim Count",
+        "Chips From HV Elims",
+        "Base Stack",
+        "Total Stack",
+    ]
+
+    for col in cols_to_format:
+        if col in chip_and_chair.columns:
+            chip_and_chair[col] = (
+                chip_and_chair[col]
+                .fillna(0)
+                .astype(int)
+                .map("{:,}".format)
+            )
+
     if season is None:
         raise SystemExit("SeasonTotals missing from tables. Fix build_tables() return dict.")
     if weekly is None:
