@@ -1,4 +1,5 @@
 from curses import raw
+from importlib.resources import files
 from pathlib import Path
 import pandas as pd
 from datetime import datetime
@@ -6,6 +7,7 @@ from datetime import datetime
 DATA_DIR = Path("data")
 OUT_DIR = Path("output")
 TABLES_DIR = OUT_DIR / "tables"
+LAST_SOURCE_FILE = "N/A"
 
 from datetime import datetime
 
@@ -46,6 +48,9 @@ def load_raw_events(data_dir: Path) -> pd.DataFrame:
     files = sorted(data_dir.glob("*.csv"))
     if not files:
         raise SystemExit(f"No CSV files found in {data_dir.resolve()}")
+    
+    global LAST_SOURCE_FILE
+    LAST_SOURCE_FILE = files[-1].name
 
     dfs = []
     for f in files:
@@ -768,8 +773,12 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
 </head>
 <body>
   <h1>PokerLeague Stats</h1>
-  <p style="margin: 6px 0 14px; color: #666; font-size: 13px;">
-  UUpdated: <strong>{BUILD_TS_EST}</strong>
+  <p style="margin: 6px 0 6px; color: #666; font-size: 13px;">
+  Updated: <strong>{BUILD_TS_EST}</strong>
+</p>
+
+<p style="margin: 0px 0 14px; color: #666; font-size: 13px;">
+  Latest file: <strong>{LAST_SOURCE_FILE}</strong>
 </p>
 
 {_nav()}
