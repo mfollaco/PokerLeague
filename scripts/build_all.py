@@ -6,7 +6,10 @@ from datetime import datetime, timezone
 DATA_DIR = Path("data")
 OUT_DIR = Path("output")
 TABLES_DIR = OUT_DIR / "tables"
-BUILD_TS_UTC = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+from datetime import datetime, timezone
+
+BUILD_TS_UTC = datetime.now(timezone.utc).strftime("%b %d, %Y %I:%M %p UTC")
 
 def format_int_cols_for_html(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """
