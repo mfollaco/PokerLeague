@@ -1,10 +1,12 @@
 from curses import raw
 from pathlib import Path
 import pandas as pd
+from datetime import datetime, timezone
 
 DATA_DIR = Path("data")
 OUT_DIR = Path("output")
 TABLES_DIR = OUT_DIR / "tables"
+BUILD_TS_UTC = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 def format_int_cols_for_html(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """
@@ -761,12 +763,13 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
 </head>
 <body>
   <h1>PokerLeague Stats</h1>
-  <div class="note">
-    Auto-built from CSVs in <code>python/data/</code>.
-    Refresh by running <code>python scripts/build_all.py</code>.
-  </div>
+  <p style="margin: 6px 0 14px; color: #666; font-size: 13px;">
+  Updated: <strong>{BUILD_TS_UTC}</strong>
+</p>
+
 {_nav()}
-  <h2>{h2}</h2>
+
+<h2>{h2}</h2>
 {body_html}
 </body>
 </html>
