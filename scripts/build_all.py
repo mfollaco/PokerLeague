@@ -44,19 +44,21 @@ def format_int_cols_for_html(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
 
     return out
 
-def load_raw_events(data_dir: Path) -> pd.DataFrame:
-    files = sorted(data_dir.glob("* log.csv"))
-    last_source_file = files[-1].name if files else "N/A"
+LAST_SOURCE_FILE = "N/A"
+
+def load_raw_events(data_dir: Path) -> tuple[pd.DataFrame, str]:
+    files = list(data_dir.glob("*.log.csv"))
     if not files:
-        raise SystemExit(f"No CSV files found in {data_dir.resolve()}")
-    
+        raise SystemExit(f"No log CSV files found in {data_dir.resolve()}")
+
+    files.sort(key=lambda p: p.stat().st_mtime)
+
     global LAST_SOURCE_FILE
     LAST_SOURCE_FILE = files[-1].name
 
     dfs = []
     for f in files:
-        # filename like "01.13.26 log.csv" -> "01.13.26"
-        date_text = f.stem.split()[0]  # first token
+        date_text = f.stem.split()[0]
         tournament_date = pd.to_datetime(date_text, format="%m.%d.%y", errors="coerce").date()
 
         df = pd.read_csv(f)
@@ -65,18 +67,7 @@ def load_raw_events(data_dir: Path) -> pd.DataFrame:
         dfs.append(df)
 
     raw = pd.concat(dfs, ignore_index=True)
-
-    # Normalize strings
-    for col in ["Event", "Players", "Eliminated By", "Level", "Amount", "Table", "Position"]:
-        if col in raw.columns:
-            raw[col] = raw[col].astype("string")
-
-    # Time like "7:10pm" -> time; keep original too
-    if "Time" in raw.columns:
-        raw["TimeText"] = raw["Time"].astype("string")
-        raw["Time"] = pd.to_datetime(raw["TimeText"], format="%I:%M%p", errors="coerce").dt.time
-
-    return raw, last_source_file
+    return raw, LAST_SOURCE_FILE
 
 def build_tables(raw: pd.DataFrame) -> dict[str, pd.DataFrame]:
     # ---- TournamentPlayers (from BuyIn events) ----
