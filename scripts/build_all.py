@@ -165,14 +165,16 @@ def build_tables(raw: pd.DataFrame) -> dict[str, pd.DataFrame]:
     if not elims.empty:
         elims_sorted = elims.sort_values(["SourceFile", "EliminationTime"], na_position="last").copy()
         fp = pd.merge(elims_sorted, weekly_summary, on=["SourceFile", "TournamentDate"], how="left")
+
         fp["ElimOrder"] = fp.groupby(["SourceFile", "TournamentDate"]).cumcount() + 1
         fp["Place"] = fp["PlayersCount"] - fp["ElimOrder"] + 1
         finish_positions = fp[["SourceFile", "TournamentDate", "EliminatedPlayer", "Place", "PlayersCount"]].rename(
             columns={"EliminatedPlayer": "Player"}
         )
     else:
-        finish_positions = pd.DataFrame(columns=["SourceFile", "TournamentDate", "Player", "Place", "PlayersCount"])
-
+        finish_positions = pd.DataFrame(
+            columns=["SourceFile", "TournamentDate", "Player", "Place", "PlayersCount"]
+        )
     # ---- Winners (bought in but never eliminated) ----
     if not tournament_players.empty:
         winners = pd.merge(
