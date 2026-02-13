@@ -47,12 +47,21 @@ def format_int_cols_for_html(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
 LAST_SOURCE_FILE = "N/A"
 
 def load_raw_events(data_dir: Path) -> tuple[pd.DataFrame, str]:
-    files = list(data_dir.glob("*.log.csv"))
-    if not files:
+    # Grab all CSVs
+    files = sorted(data_dir.glob("*.csv"))
+
+    # Keep only weekly log files (ignore roster.csv)
+    log_files = [p for p in files if p.name.lower().endswith(" log.csv")]
+
+    if not log_files:
         raise SystemExit(f"No log CSV files found in {data_dir.resolve()}")
 
-    files.sort(key=lambda p: p.stat().st_mtime)
+    # Pick newest by modified time
+    log_files.sort(key=lambda p: p.stat().st_mtime)
 
+    files = log_files
+
+    
     global LAST_SOURCE_FILE
     LAST_SOURCE_FILE = files[-1].name
 
