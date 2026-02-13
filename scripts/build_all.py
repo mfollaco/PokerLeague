@@ -7,7 +7,8 @@ from datetime import datetime
 DATA_DIR = Path("data")
 OUT_DIR = Path("output")
 TABLES_DIR = OUT_DIR / "tables"
-LAST_SOURCE_FILE = "N/A"
+log_files = sorted(DATA_DIR.glob("* log.csv"))
+LAST_SOURCE_FILE = log_files[-1].name if log_files else "N/A"
 
 from datetime import datetime
 
