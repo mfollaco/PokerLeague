@@ -7,8 +7,7 @@ from datetime import datetime
 DATA_DIR = Path("data")
 OUT_DIR = Path("output")
 TABLES_DIR = OUT_DIR / "tables"
-log_files = sorted(DATA_DIR.glob("* log.csv"))
-LAST_SOURCE_FILE = log_files[-1].name if log_files else "N/A"
+
 
 from datetime import datetime
 
@@ -46,7 +45,8 @@ def format_int_cols_for_html(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     return out
 
 def load_raw_events(data_dir: Path) -> pd.DataFrame:
-    files = sorted(data_dir.glob("*.csv"))
+    files = sorted(data_dir.glob("* log.csv"))
+    last_source_file = files[-1].name if files else "N/A"
     if not files:
         raise SystemExit(f"No CSV files found in {data_dir.resolve()}")
     
@@ -76,7 +76,7 @@ def load_raw_events(data_dir: Path) -> pd.DataFrame:
         raw["TimeText"] = raw["Time"].astype("string")
         raw["Time"] = pd.to_datetime(raw["TimeText"], format="%I:%M%p", errors="coerce").dt.time
 
-    return raw
+    return raw, last_source_file
 
 def build_tables(raw: pd.DataFrame) -> dict[str, pd.DataFrame]:
     # ---- TournamentPlayers (from BuyIn events) ----
@@ -686,7 +686,7 @@ def build_weekly_section(weekly: pd.DataFrame) -> str:
         )
 
     return nav_html + "\n" + "\n".join(sections)
-def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
+def write_outputs(tables: dict, last_source_file: str) -> None:
     OUT_DIR.mkdir(exist_ok=True)
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -779,7 +779,7 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
 </p>
 
 <p style="margin: 0px 0 14px; color: #666; font-size: 13px;">
-  Latest file: <strong>{LAST_SOURCE_FILE}</strong>
+  Latest file: <strong>{last_source_file}</strong>
 </p>
 
 {_nav()}
@@ -795,7 +795,7 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
     index_html = _page(
         title="PokerLeague Stats",
         h2="Dashboard",
-        body_html="""
+        body_html=f"""
   <p class="note">Pick a page:</p>
   <ul>
     <li><a href="season-totals.html">Season Totals</a></li>
@@ -847,10 +847,10 @@ def write_outputs(tables: dict[str, pd.DataFrame]) -> None:
     print("✅ Built site:", SITE_DIR)
 
 def main():
-    raw = load_raw_events(DATA_DIR)
+    raw, last_source_file = load_raw_events(DATA_DIR)
     tables = build_tables(raw)
     print("TABLE KEYS:", sorted(tables.keys()))
-    write_outputs(tables)
+    write_outputs(tables, last_source_file)
     print("✅ Built outputs:")
     print(f"   - {TABLES_DIR.resolve()}")
     print(f"   - {(OUT_DIR / 'dashboard.html').resolve()}")
