@@ -345,8 +345,16 @@ def build_tables(raw: pd.DataFrame) -> dict[str, pd.DataFrame]:
     wt = weekly_tournaments.copy()
     if ("StartTime" in wt.columns) and ("EndTime" in wt.columns) and (not wt.empty):
         wt["TournamentDate"] = pd.to_datetime(wt["TournamentDate"]).dt.date
-        wt["StartDT"] = pd.to_datetime(wt["TournamentDate"].astype(str) + " " + wt["StartTime"].astype(str), errors="coerce")
-        wt["EndDT"] = pd.to_datetime(wt["TournamentDate"].astype(str) + " " + wt["EndTime"].astype(str), errors="coerce")
+        wt["StartDT"] = pd.to_datetime(
+    wt["TournamentDate"].astype(str) + " " + wt["StartTime"].astype(str),
+    format="%Y-%m-%d %H:%M:%S",
+    errors="coerce",
+)
+        wt["EndDT"] = pd.to_datetime(
+    wt["TournamentDate"].astype(str) + " " + wt["EndTime"].astype(str),
+    format="%Y-%m-%d %H:%M:%S",
+    errors="coerce",
+)
         wt["TournamentMinutes"] = (wt["EndDT"] - wt["StartDT"]).dt.total_seconds() / 60.0
 
         elim_surv = pd.DataFrame(columns=["TournamentDate", "Player", "MinutesSurvived", "TournamentMinutes"])
@@ -355,6 +363,7 @@ def build_tables(raw: pd.DataFrame) -> dict[str, pd.DataFrame]:
             e["TournamentDate"] = pd.to_datetime(e["TournamentDate"]).dt.date
             e["EliminationDT"] = pd.to_datetime(
                 e["TournamentDate"].astype(str) + " " + e["EliminationTime"].astype(str),
+                format="%Y-%m-%d %H:%M:%S",
                 errors="coerce",
             )
             e = e.merge(wt[["SourceFile", "TournamentDate", "StartDT", "TournamentMinutes"]], on=["SourceFile", "TournamentDate"], how="left")
