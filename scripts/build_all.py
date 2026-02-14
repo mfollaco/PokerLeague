@@ -147,35 +147,48 @@ def build_tables(raw: pd.DataFrame) -> dict[str, pd.DataFrame]:
 
     # ---- Eliminations ----
     elims = raw.loc[raw["Event"].astype(str).str.upper().str.strip() == "ELIMINATED"].copy()
+
     if not elims.empty:
         elims = elims.rename(
             columns={
-                "Players": "EliminatedPlayer",
-                "Eliminated By": "EliminatorPlayer",
+                "Players": "EliminatedPlayer",        # busted player
+                "Eliminated By": "EliminatorPlayer",  # who busted them
                 "Time": "EliminationTime",
             }
         )
-        elims = elims[["SourceFile", "TournamentDate", "EliminationTime", "EliminatedPlayer", "EliminatorPlayer"]]
+
+        # build a sortable datetime for elimination order
+        elims["EliminationDT"] = pd.to_datetime(
+            elims["TournamentDate"].astype(str) + " " + elims["EliminationTime"].astype(str),
+            errors="coerce",
+        )
+
+        elims = elims[["SourceFile", "TournamentDate", "EliminationTime", "EliminationDT",
+                    "EliminatedPlayer", "EliminatorPlayer"]]
+
+        # VERY IMPORTANT: one row per eliminated player per tournament (prevents duplicates blowing up places)
+        elims = elims.sort_values(["SourceFile", "TournamentDate", "EliminationDT"], na_position="last")
+        elims = elims.drop_duplicates(subset=["SourceFile", "TournamentDate", "EliminatedPlayer"], keep="first")
     else:
         elims = pd.DataFrame(
-            columns=["SourceFile", "TournamentDate", "EliminationTime", "EliminatedPlayer", "EliminatorPlayer"]
+            columns=["SourceFile", "TournamentDate", "EliminationTime", "EliminationDT",
+                    "EliminatedPlayer", "EliminatorPlayer"]
         )
 
     # ---- FinishPositions (place = reverse elimination order; winner = not eliminated) ----
     if not elims.empty:
-        elims_sorted = elims.sort_values(["SourceFile", "EliminationTime"], na_position="last").copy()
-        fp = pd.merge(elims_sorted, weekly_summary, on=["SourceFile", "TournamentDate"], how="left")
+        fp = elims.sort_values(["SourceFile", "TournamentDate", "EliminationDT"], na_position="last").copy()
+        fp = fp.merge(weekly_summary, on=["SourceFile", "TournamentDate"], how="left")
 
         fp["ElimOrder"] = fp.groupby(["SourceFile", "TournamentDate"]).cumcount() + 1
         fp["Place"] = fp["PlayersCount"] - fp["ElimOrder"] + 1
-        finish_positions = fp[["SourceFile", "TournamentDate", "EliminatedPlayer", "Place", "PlayersCount"]].rename(
-            columns={"EliminatedPlayer": "Player"}
-        )
+
+        finish_positions = fp[["SourceFile", "TournamentDate", "EliminatedPlayer", "Place", "PlayersCount"]] \
+            .rename(columns={"EliminatedPlayer": "Player"})
     else:
-        finish_positions = pd.DataFrame(
-            columns=["SourceFile", "TournamentDate", "Player", "Place", "PlayersCount"]
-        )
-    # ---- Winners (bought in but never eliminated) ----
+        finish_positions = pd.DataFrame(columns=["SourceFile", "TournamentDate", "Player", "Place", "PlayersCount"])
+
+    # Add winner rows (players who bought in but do NOT appear in FinishPositions for THAT tournament)
     if not tournament_players.empty:
         winners = pd.merge(
             tournament_players[["SourceFile", "TournamentDate", "Player"]],
@@ -184,11 +197,27 @@ def build_tables(raw: pd.DataFrame) -> dict[str, pd.DataFrame]:
             how="left",
             indicator=True,
         )
+
         winners = winners[winners["_merge"] == "left_only"].drop(columns=["_merge"])
-        winners = pd.merge(winners, weekly_summary, on=["SourceFile", "TournamentDate"], how="left")
+
+        winners = pd.merge(
+            winners,
+            weekly_summary,
+            on=["SourceFile", "TournamentDate"],
+            how="left"
+        )
+
         winners["Place"] = 1
+
+        finish_positions = pd.concat(
+            [finish_positions, winners[["SourceFile", "TournamentDate", "Player", "Place", "PlayersCount"]]],
+            ignore_index=True
+        )
     else:
         winners = pd.DataFrame(columns=["SourceFile", "TournamentDate", "Player", "PlayersCount", "Place"])
+        
+    # final sort for readability
+    finish_positions = finish_positions.sort_values(["SourceFile", "TournamentDate", "Place", "Player"]).reset_index(drop=True)
 
     # ---- Weekly points (0.5 per place; winner gets PlayersCount*0.5) ----
     if not finish_positions.empty:
@@ -196,13 +225,19 @@ def build_tables(raw: pd.DataFrame) -> dict[str, pd.DataFrame]:
     if not winners.empty:
         winners["Points"] = winners["PlayersCount"] * 0.5
 
-    weekly_points = pd.concat(
-        [
-            finish_positions[["SourceFile", "TournamentDate", "Player", "Points"]],
-            winners[["SourceFile", "TournamentDate", "Player", "Points"]],
-        ],
-        ignore_index=True,
-    )
+    # ---- Weekly points (0.5 per place; winner gets PlayersCount*0.5) ----
+    finish_points = finish_positions[["SourceFile", "TournamentDate", "Player", "Points"]].copy()
+
+    # wi0nners may be empty OR may not have Points depending on earlier logic
+    if winners is None or winners.empty:
+        winners_points = pd.DataFrame(columns=["SourceFile", "TournamentDate", "Player", "Points"])
+    else:
+        # if somehow Points is missing, create it (keeps code from blowing up)
+        if "Points" not in winners.columns:
+            winners["Points"] = winners.get("PlayersCount", 0) * 0.5
+        winners_points = winners[["SourceFile", "TournamentDate", "Player", "Points"]].copy()
+
+    weekly_points = pd.concat([finish_points, winners_points], ignore_index=True)
 
     if not weekly_points.empty:
         weekly_points = (
