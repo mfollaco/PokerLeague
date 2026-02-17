@@ -140,6 +140,28 @@ body.bg-vegas {
   font-weight: 600;
 }
 
+/* Solid gold Vegas badge */
+.badge-vegas-gold {
+  background-color: #ffd86b !important;   /* bright gold */
+  color: #1a1a1a !important;              /* deep charcoal text */
+  font-weight: 700;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.4rem;
+  text-shadow: 0 0 4px rgba(255, 216, 107, 0.6);
+}
+
+/* Outline gold Vegas badge */
+.badge-vegas-outline {
+  border: 2px solid #ffd86b !important;
+  color: #ffd86b !important;
+  background-color: transparent !important;
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.4rem;
+  text-shadow: 0 0 4px rgba(255, 216, 107, 0.5);
+}
+
+
 
 
 
