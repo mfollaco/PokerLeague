@@ -93,3 +93,21 @@ body.bg-vegas {
 .table-gold {
   color: var(--vegas-gold) !important;
 }
+
+/* Brighten homepage card text */
+#next-event,
+#latest-winner,
+#current-leaders {
+  color: #f8f9fa !important; /* bright white */
+}
+
+#next-event h6,
+#latest-winner h6,
+#current-leaders h6 {
+  color: #ffd86b !important; /* gold */
+}
+
+.card-vegas p,
+.card-vegas li {
+  color: #e0e0e0 !important; /* light gray */
+}
