@@ -112,6 +112,10 @@ body.bg-vegas {
   color: #e0e0e0 !important; /* light gray */
 }
 
-.card-vegas {
-  background-color: #1b1b1b !important; /* slightly lighter than pure black */
+
+/* Brighten card headers */
+.card-vegas .card-header h5 {
+  color: #ffd86b !important; /* bright gold */
+  font-weight: 600;
 }
+
