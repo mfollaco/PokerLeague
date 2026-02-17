@@ -119,3 +119,10 @@ body.bg-vegas {
   font-weight: 600;
 }
 
+/* Brighten the tagline under the hero title */
+.hero-tagline,
+.hero-tagline span {
+  color: #ffd86b !important; /* same gold as headers */
+}
+
+
