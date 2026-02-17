@@ -111,3 +111,7 @@ body.bg-vegas {
 .card-vegas li {
   color: #e0e0e0 !important; /* light gray */
 }
+
+.card-vegas {
+  background-color: #1b1b1b !important; /* slightly lighter than pure black */
+}
