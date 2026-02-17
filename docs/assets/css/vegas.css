@@ -125,4 +125,14 @@ body.bg-vegas {
   color: #ffd86b !important; /* same gold as headers */
 }
 
+/* Force gold color on the hero tagline */
+.hero-tagline {
+  color: #ffd86b !important;
+}
+
+.hero-tagline span {
+  color: #ffd86b !important;
+}
+
+
 
