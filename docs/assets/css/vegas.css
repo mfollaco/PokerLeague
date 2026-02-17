@@ -134,5 +134,13 @@ body.bg-vegas {
   color: #ffd86b !important;
 }
 
+/* Gold badge text override */
+.season-gold {
+  color: #000 !important; /* or #1b1b1b if you want softer */
+  font-weight: 600;
+}
+
+
+
 
 
