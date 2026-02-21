@@ -1,0 +1,61 @@
+name: Build site on weekly CSV upload
+
+on:
+  push:
+    paths:
+      - "data/incoming/*.csv"
+      - "backend/**"
+      - "frontend/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Determine newest CSV (by filename sort)
+        id: latest
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          files = sorted(Path("data/incoming").glob("*.csv"))
+          if not files:
+              raise SystemExit("No CSV files found in data/incoming")
+
+          latest = files[-1]  # filename sort; works with mm.dd.yy_ naming
+          print(f"Using CSV: {latest}")
+
+          with open("${GITHUB_OUTPUT}", "a", encoding="utf-8") as f:
+              f.write(f"latest_csv={latest}\n")
+          PY
+
+      - name: Ingest latest CSV + export season JSON
+        run: |
+          python backend/scripts/ingest_week_csv.py --season spring_2026 --csv "${{ steps.latest.outputs.latest_csv }}"
+          python backend/scripts/export_season_json.py --season spring_2026
+
+      - name: Commit generated JSON (if changed)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add frontend/data/*.json || true
+
+          git diff --cached --quiet || (git commit -m "Update site data from weekly CSV" && git push)
