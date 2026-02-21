@@ -29,17 +29,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Determine newest CSV (by filename sort)
+      - name: Determine newest CSV (by upload time)
         id: latest
         run: |
           python - <<'PY'
           from pathlib import Path
 
-          files = sorted(Path("data/incoming").glob("*.csv"))
+          files = list(Path("data/incoming").glob("*.csv"))
           if not files:
               raise SystemExit("No CSV files found in data/incoming")
 
-          latest = files[-1]  # filename sort; works with mm.dd.yy_ naming
+          latest = max(files, key=lambda p: p.stat().st_mtime)
           print(f"Using CSV: {latest}")
 
           with open("${GITHUB_OUTPUT}", "a", encoding="utf-8") as f:
