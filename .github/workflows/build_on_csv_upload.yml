@@ -46,10 +46,9 @@ jobs:
               f.write(f"latest_csv={latest}\n")
           PY
 
-      - name: Ingest latest CSV + export season JSON
+      - name: Run build
         run: |
-          python backend/scripts/ingest_week_csv.py --season spring_2026 --csv "${{ steps.latest.outputs.latest_csv }}"
-          python backend/scripts/export_season_json.py --season spring_2026
+          make build
 
       - name: Commit generated JSON (if changed)
         run: |
